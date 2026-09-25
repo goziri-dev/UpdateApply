@@ -1,0 +1,21 @@
+---
+description: Conventions and boundaries for work in UpdateApply
+alwaysApply: true
+---
+
+# UpdateApply conventions
+
+The repo is early. Follow what is already in the tree. Do not introduce a stack, framework, or folder layout until one exists or Favour asks for it.
+
+## Do
+
+- Read the surrounding code before editing and match its style.
+- Keep each change limited to the task.
+- Put secrets in `.env` files. Those are gitignored. If a new setting is required, document the key in `.env.example` only.
+
+## Do not
+
+- Commit or print secrets, tokens, or `.env` contents.
+- Add dependencies, services, or scaffolding the task does not need.
+- Refactor or rename unrelated code while doing something else.
+- Create commits or push unless asked.
