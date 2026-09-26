@@ -33,3 +33,6 @@ select = ["I"]  # isort rules
 
 [tool.ruff.lint.isort]
 known-first-party = ["server"]
+
+[tool.pyrefly]
+python-interpreter-path = ".venv/bin/python"

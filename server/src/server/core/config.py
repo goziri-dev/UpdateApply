@@ -7,7 +7,7 @@ class _Settings(BaseSettings):
     app_name: str = "UpdateApply"
     app_host: str = "0.0.0.0"
     app_port: int = 8000
-    openrouter_api_key=""
+    openrouter_api_key: str
 
     model_config = SettingsConfigDict(
         env_file=".env", 

@@ -1,7 +1,7 @@
 import uvicorn
 from fastapi import FastAPI
 
-from server.api.v1.cv import cv_router
+from server.api.v1.router import api_v1
 from server.core.config import settings
 
 app = FastAPI(title=settings.app_name)
@@ -11,7 +11,7 @@ app = FastAPI(title=settings.app_name)
 async def health_check():
     return {"status": "Ok", "message": "Server is running!"}
 
-app.include_router(cv_router, prefix="/api/v1")
+app.include_router(api_v1)
 
 
 def main():
