@@ -10,15 +10,17 @@ from server.core.config import settings
 class Model(StrEnum):
     GEMINI_2_5_FLASH = "google/gemini-2.5-flash"
 
+
 class Task(StrEnum):
     PROCESS_CV = Model.GEMINI_2_5_FLASH
+
 
 class _Agent:
     def __init__(
         self,
         model: Model = Model.GEMINI_2_5_FLASH,
         system_prompt: str | None = None,
-        structured_output: type[BaseModel] | None = None
+        structured_output: type[BaseModel] | None = None,
     ):
         self._agent = ChatOpenRouter(
             api_key=settings.openrouter_api_key,
@@ -26,12 +28,14 @@ class _Agent:
         ).with_structured_output(structured_output)
         self._system_prompt = system_prompt
 
-    
     async def invoke(self, prompt: str):
-        return await self._agent.ainvoke([
-            SystemMessage(content=self._system_prompt),
-            HumanMessage(content=prompt),
-        ])
+        return await self._agent.ainvoke(
+            [
+                SystemMessage(content=self._system_prompt),
+                HumanMessage(content=prompt),
+            ]
+        )
+
 
 def create_agent(
     model_or_task: Model | Task = Model.GEMINI_2_5_FLASH,

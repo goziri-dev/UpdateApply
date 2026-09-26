@@ -10,14 +10,14 @@ class _Settings(BaseSettings):
     openrouter_api_key: str
 
     model_config = SettingsConfigDict(
-        env_file=".env", 
-        env_file_encoding="utf-8",
-        extra="ignore"
+        env_file=".env", env_file_encoding="utf-8", extra="ignore"
     )
+
 
 @lru_cache
 def get_settings() -> _Settings:
     """Helper function to load settings once and cache them across imports."""
     return _Settings()
+
 
 settings = get_settings()
