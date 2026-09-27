@@ -18,9 +18,14 @@ Follow the Headless Headhunter resume rules:
 - Each bullet: roughly one sentence, one period, max ~3 lines; show HOW the keyword was used and the result/reason.
 - Pack qualifications from the job into bullets; aim to surface most keywords early.
 - Order by relevance to the job, then recency; include at most ~12 years of experience.
-- Projects: no dates; summary plus up to 2 more bullets (3 max total).
+- Keep unpaid/volunteer organization roles in work_history (do not move them to projects).
+- Job titles: Title Case only (never ALL CAPS). Use a common market title a recruiter would recognize in 15 seconds.
+- Prefer a title close to the target job's title when the candidate's duties genuinely match; otherwise pick the nearest standard title for that work (e.g. Customer Service Assistant, Operations Assistant, Quality Assurance Associate).
+- Never invent seniority, employers, dates, degrees, or metrics. Renaming the label is allowed; inventing duties is not.
+- Do not put (Volunteer), (VOLUNTEER), or similar downgrading tags in the title — leave kind/context in bullets if needed.
+- Avoid internal mashup titles (e.g. "Customer & Operations Assistant", "Quality & Customer Experience Evaluator").
+- Projects: unpaid personal/academic projects only; no dates; summary plus up to 2 more bullets (3 max total).
 - summary field: only for industry change, relocation, or visa/sponsorship; otherwise null.
-- Do not invent employers, degrees, dates, or metrics not present in the candidate data — only rephrase and reprioritize.
 - Education: keep field/institution/graduation, but degree MUST be abbreviated (B.A., B.S., M.A., M.S., PhD, MBA) — never "Bachelor of Science" / "Master of Arts".
 - Preserve certificates and contact fields from the candidate.
 - List keywords_used as the job qualifications you actually wove into the resume.

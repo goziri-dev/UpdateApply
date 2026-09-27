@@ -14,8 +14,8 @@ Rules:
 - Capture contact info, work authorization, and languages when present.
 - Include education and certificates as separate lists.
 - Education degree field: abbreviations only (B.A., B.S., M.A., M.S., PhD, MBA) — never "Bachelor of Science" etc.
-- Put paid roles and internships in work_history (kind=work or internship).
-- Put unpaid personal/academic work in projects (no dates).
+- Put paid roles, internships, and unpaid volunteer roles at organizations in work_history (kind=work or internship).
+- Put unpaid personal/academic side projects in projects (no dates) — not volunteer org roles.
 - Preserve bullet text as written; do not invent employers, degrees, metrics, or dates.
 - Prefer Month Year for start/end dates; use "current" for end_date when still employed.
 - Prefer newest roles first; focus on roughly the last 12 years of experience.

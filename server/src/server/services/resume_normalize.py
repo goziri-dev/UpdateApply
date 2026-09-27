@@ -28,6 +28,10 @@ _DEGREE_PATTERNS: list[tuple[re.Pattern[str], str]] = [
 ]
 
 _YEAR_RE = re.compile(r"(20\d{2}|19\d{2})")
+_VOLUNTEER_TAG_RE = re.compile(
+    r"\s*[\(\[{]?\s*volunteer\s*[\)\]}]?\s*",
+    re.IGNORECASE,
+)
 
 
 def abbreviate_degree(degree: str | None) -> str | None:
@@ -39,6 +43,19 @@ def abbreviate_degree(degree: str | None) -> str | None:
         if pattern.search(text):
             return abbr
     return text
+
+
+def normalize_job_title(title: str | None) -> str | None:
+    """Strip downgrading volunteer tags and fix ALL-CAPS titles."""
+    if not title:
+        return title
+    text = _VOLUNTEER_TAG_RE.sub(" ", title).strip()
+    text = re.sub(r"\s{2,}", " ", text).strip(" -|,")
+    letters = [c for c in text if c.isalpha()]
+    if letters and all(c.isupper() for c in letters) and len(letters) > 3:
+        text = text.title()
+        text = text.replace("&Amp;", "&").replace(" And ", " & ")
+    return text or title.strip()
 
 
 def education_status_label(graduation: str | None) -> str | None:
@@ -71,10 +88,16 @@ def normalize_education_entry(entry: EducationEntry) -> EducationEntry:
 
 def normalize_tailored_resume(resume: TailoredResume) -> TailoredResume:
     """Apply guide formatting fixes the LLM may miss."""
-    if not resume.education:
+    updates: dict = {}
+    if resume.education:
+        updates["education"] = [
+            normalize_education_entry(e) for e in resume.education
+        ]
+    if resume.work_history:
+        updates["work_history"] = [
+            role.model_copy(update={"title": normalize_job_title(role.title)})
+            for role in resume.work_history
+        ]
+    if not updates:
         return resume
-    return resume.model_copy(
-        update={
-            "education": [normalize_education_entry(e) for e in resume.education],
-        }
-    )
+    return resume.model_copy(update=updates)

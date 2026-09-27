@@ -33,7 +33,14 @@ class TailoredWorkExperience(BaseModel):
         ExperienceKind.WORK,
         description="work or internship",
     )
-    title: str | None = Field(None, description="Job title")
+    title: str | None = Field(
+        None,
+        description=(
+            "Common market job title in Title Case (never ALL CAPS). "
+            "Prefer alignment with the target job title when duties match; "
+            "no (Volunteer) tags or internal mashup titles"
+        ),
+    )
     company: str | None = Field(None, description="Company name")
     location: str | None = Field(None, description="City/state or remote")
     start_date: str | None = Field(None, description="Month Year start")
