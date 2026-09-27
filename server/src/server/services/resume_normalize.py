@@ -45,7 +45,7 @@ def education_status_label(graduation: str | None) -> str | None:
     """Guide-shaped right-side education status.
 
     - Graduated (>3 years): Status - Graduated
-    - Still enrolled / future year: Status - Expected YYYY
+    - Still enrolled / future year: Expected YYYY
     - Recent graduation year: YYYY
     """
     if not graduation:
@@ -56,11 +56,11 @@ def education_status_label(graduation: str | None) -> str | None:
         return "Status - Graduated"
     year_match = _YEAR_RE.search(text)
     if "expected" in lower and year_match:
-        return f"Status - Expected {year_match.group(1)}"
+        return f"Expected {year_match.group(1)}"
     if year_match:
         year = int(year_match.group(1))
         if year > date.today().year:
-            return f"Status - Expected {year}"
+            return f"Expected {year}"
         return str(year)
     return text
 
