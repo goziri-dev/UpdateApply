@@ -13,6 +13,7 @@ class Model(StrEnum):
 
 class Task(StrEnum):
     PROCESS_CV = Model.GEMINI_2_5_FLASH
+    PARSE_JOB_POSTING = Model.GEMINI_2_5_FLASH
 
 
 class _Agent:
