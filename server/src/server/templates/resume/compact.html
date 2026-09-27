@@ -17,7 +17,7 @@
       padding: 0.45in 0.6in;
     }
     a { color: #0000ee; text-decoration: none; }
-    .header { text-align: center; margin-bottom: 0.2em; }
+    .header { text-align: center; margin-bottom: 1em; }
     .name {
       font-size: 14pt;
       font-weight: bold;
@@ -25,91 +25,100 @@
     }
     .contact {
       font-size: 12pt;
-      line-height: 1.1;
-      margin-top: 0.08em;
+      line-height: 1.15;
     }
-    .contact-line { margin: 0; }
+    .contact-line { margin: 0; font-weight: normal; }
     .sep::before { content: " | "; }
     .languages {
       font-size: 12pt;
-      line-height: 1.1;
-      margin-top: 0.05em;
+      line-height: 1.15;
+      font-weight: normal;
     }
     .summary {
-      margin: 0.25em 0 0.35em;
+      margin: 0 0 1em;
       text-align: left;
+      font-weight: normal;
     }
-    .section { margin-top: 0.35em; text-align: left; }
+    .section { margin-top: 1em; text-align: left; }
+    .section:first-of-type { margin-top: 0; }
     .section-title {
       font-size: 10.5pt;
       font-weight: bold;
-      margin-bottom: 0.1em;
-    }
-    .edu-list, .bullets {
-      list-style: disc;
-      padding-left: 1.1em;
-      margin: 0;
-    }
-    .edu-list li, .bullets li {
       margin: 0;
       padding: 0;
     }
-    .role { margin-top: 0.25em; }
-    .role:first-child { margin-top: 0.08em; }
+    .edu-list, .bullets {
+      list-style: disc;
+      padding-left: 1.2em;
+      margin: 0;
+    }
+    .edu-list { margin-top: 0; }
+    .edu-list li, .bullets li {
+      margin: 0;
+      padding: 0;
+      font-weight: normal;
+    }
+    .edu-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 1em;
+      flex-wrap: nowrap;
+      font-weight: normal;
+    }
+    .edu-left { text-align: left; flex: 1 1 auto; min-width: 0; }
+    .edu-dates {
+      text-align: right;
+      white-space: nowrap;
+      flex: 0 0 auto;
+      font-weight: normal;
+    }
+    .role { margin-top: 1em; }
+    .role:first-of-type { margin-top: 0; }
     .job-line {
       font-style: italic;
       font-weight: normal;
       display: flex;
       justify-content: space-between;
-      gap: 0.75em;
-      flex-wrap: wrap;
+      align-items: baseline;
+      gap: 1em;
+      flex-wrap: nowrap;
+      margin: 0;
+      padding: 0;
     }
-    .job-left { text-align: left; }
-    .job-dates { text-align: right; white-space: nowrap; }
+    .job-left {
+      text-align: left;
+      flex: 1 1 auto;
+      min-width: 0;
+      font-weight: normal;
+    }
+    .job-dates {
+      text-align: right;
+      white-space: nowrap;
+      flex: 0 0 auto;
+      font-weight: normal;
+    }
+    .bullets { margin-top: 0; padding-top: 0; }
     .project-title {
       font-style: italic;
-      margin-bottom: 0.05em;
+      font-weight: normal;
+      margin: 0;
     }
   </style>
 </head>
 <body>
   <header class="header">
-    {% if resume.full_name %}
-    <div class="name">{{ resume.full_name }}</div>
-    {% endif %}
+    {% if resume.full_name %}<div class="name">{{ resume.full_name }}</div>{% endif %}
     <div class="contact">
       {% if resume.phone or resume.email or resume.linkedin_url or resume.website_url %}
-      <p class="contact-line">
-        {% set ns = namespace(first=true) %}
-        {% if resume.phone %}
-          {% set ns.first = false %}{{ resume.phone }}
-        {% endif %}
-        {% if resume.email %}
-          {% if not ns.first %}<span class="sep"></span>{% endif %}
-          {% set ns.first = false %}<a href="mailto:{{ resume.email }}">{{ resume.email }}</a>
-        {% endif %}
-        {% if resume.linkedin_url %}
-          {% if not ns.first %}<span class="sep"></span>{% endif %}
-          {% set ns.first = false %}<a href="{{ resume.linkedin_url }}">{{ resume.linkedin_url }}</a>
-        {% endif %}
-        {% if resume.website_url %}
-          {% if not ns.first %}<span class="sep"></span>{% endif %}
-          {% set ns.first = false %}<a href="{{ resume.website_url }}">{{ resume.website_url }}</a>
-        {% endif %}
-      </p>
+      <p class="contact-line">{% set ns = namespace(first=true) %}{% if resume.phone %}{% set ns.first = false %}{{ resume.phone }}{% endif %}{% if resume.email %}{% if not ns.first %}<span class="sep"></span>{% endif %}{% set ns.first = false %}<a href="mailto:{{ resume.email }}">{{ resume.email }}</a>{% endif %}{% if resume.linkedin_url %}{% if not ns.first %}<span class="sep"></span>{% endif %}{% set ns.first = false %}<a href="{{ resume.linkedin_url }}">{{ resume.linkedin_url }}</a>{% endif %}{% if resume.website_url %}{% if not ns.first %}<span class="sep"></span>{% endif %}{% set ns.first = false %}<a href="{{ resume.website_url }}">{{ resume.website_url }}</a>{% endif %}</p>
       {% endif %}
-      {% if resume.location %}
-      <p class="contact-line">{{ resume.location }}</p>
-      {% endif %}
+      {% if resume.location %}<p class="contact-line">{{ resume.location }}</p>{% endif %}
     </div>
-    {% if resume.languages %}
-    <p class="languages">{{ resume.languages | join(', ') }}</p>
-    {% endif %}
+    {% if resume.languages %}<p class="languages">{{ resume.languages | join(', ') }}</p>{% endif %}
   </header>
 
-  {% if resume.summary %}
-  <p class="summary">{{ resume.summary }}</p>
-  {% endif %}
+  {% if resume.summary %}<p class="summary">{{ resume.summary }}</p>{% endif %}
 
   {% if resume.education or resume.certificates %}
   <section class="section">
@@ -117,18 +126,24 @@
     <ul class="edu-list">
       {% for edu in resume.education %}
       <li>
-        {%- set parts = [] -%}
-        {%- if edu.degree %}{% set _ = parts.append(edu.degree) %}{% endif -%}
-        {%- if edu.field %}{% set _ = parts.append(edu.field) %}{% endif -%}
-        {%- set degree_field = parts | join(' ') -%}
-        {%- if degree_field and edu.institution -%}
-          {{ degree_field }} — {{ edu.institution }}
-        {%- elif degree_field -%}
-          {{ degree_field }}
-        {%- elif edu.institution -%}
-          {{ edu.institution }}
-        {%- endif -%}
-        {%- if edu.graduation %}, {{ edu.graduation }}{% endif %}
+        <div class="edu-row">
+          <span class="edu-left">
+            {%- if edu.degree and edu.field and edu.institution -%}
+              {{ edu.degree }} in {{ edu.field }} from {{ edu.institution }}
+            {%- elif edu.degree and edu.institution -%}
+              {{ edu.degree }} from {{ edu.institution }}
+            {%- else -%}
+              {%- set parts = [] -%}
+              {%- if edu.degree %}{% set _ = parts.append(edu.degree) %}{% endif -%}
+              {%- if edu.field %}{% set _ = parts.append(edu.field) %}{% endif -%}
+              {%- if edu.institution %}{% set _ = parts.append(edu.institution) %}{% endif -%}
+              {{ parts | join(' ') }}
+            {%- endif -%}
+          </span>
+          {% if edu.graduation %}
+          <span class="edu-dates">{% if edu.graduation == 'Graduated' %}Status - Graduated{% else %}{{ edu.graduation }}{% endif %}</span>
+          {% endif %}
+        </div>
       </li>
       {% endfor %}
       {% for cert in resume.certificates %}
@@ -145,16 +160,20 @@
     <div class="role">
       <div class="job-line">
         <span class="job-left">
-          {%- set job_bits = [] -%}
-          {%- if role.title %}{% set _ = job_bits.append(role.title) %}{% endif -%}
-          {%- if role.company %}{% set _ = job_bits.append(role.company) %}{% endif -%}
-          {%- if role.location %}{% set _ = job_bits.append(role.location) %}{% endif -%}
-          {{ job_bits | join(', ') }}
+          {%- if role.title and role.company and role.location -%}
+            {{ role.title }} at {{ role.company }}, {{ role.location }}
+          {%- elif role.title and role.company -%}
+            {{ role.title }} at {{ role.company }}
+          {%- else -%}
+            {%- set job_bits = [] -%}
+            {%- if role.title %}{% set _ = job_bits.append(role.title) %}{% endif -%}
+            {%- if role.company %}{% set _ = job_bits.append(role.company) %}{% endif -%}
+            {%- if role.location %}{% set _ = job_bits.append(role.location) %}{% endif -%}
+            {{ job_bits | join(', ') }}
+          {%- endif -%}
         </span>
         {% if role.start_date or role.end_date %}
-        <span class="job-dates">
-          {{ role.start_date or '' }}{% if role.start_date and role.end_date %} to {% endif %}{{ role.end_date or '' }}
-        </span>
+        <span class="job-dates">{{ role.start_date or '' }}{% if role.start_date and role.end_date %} to {% endif %}{{ role.end_date or '' }}</span>
         {% endif %}
       </div>
       <ul class="bullets">
@@ -173,9 +192,7 @@
     <div class="section-title">Projects</div>
     {% for project in resume.projects %}
     <div class="role">
-      {% if project.title %}
-      <div class="project-title">{{ project.title }}</div>
-      {% endif %}
+      {% if project.title %}<div class="project-title">{{ project.title }}</div>{% endif %}
       <ul class="bullets">
         <li>{{ project.summary }}</li>
         {% for bullet in project.bullets %}
