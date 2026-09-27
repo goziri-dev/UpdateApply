@@ -93,8 +93,9 @@ def extract_pdf_uris(
             except AttributeError:
                 uri = None
             if uri:
-                _add_uri(seen, out, uri)
-        text = page.get_text("text") or ""
+                _add_uri(seen, out, str(uri))
+        raw_text = page.get_text("text")
+        text = raw_text if isinstance(raw_text, str) else ""
         for match in _URL_RE.findall(text):
             _add_uri(seen, out, match)
         for match in _BARE_PROFILE_RE.findall(text):
