@@ -3,6 +3,7 @@ from fastapi import APIRouter, File, HTTPException, UploadFile
 from server.schemas.candidate import Candidate
 from server.services.agent import Task, create_agent
 from server.services.pdf import InvalidOrEmptyPDF, convert_pdf_to_markdown
+from server.services.resume_normalize import normalize_education_entry
 
 cv_router = APIRouter(prefix="/cv")
 
@@ -12,6 +13,7 @@ Extract a full structured candidate profile from the CV markdown.
 Rules:
 - Capture contact info, work authorization, and languages when present.
 - Include education and certificates as separate lists.
+- Education degree field: abbreviations only (B.A., B.S., M.A., M.S., PhD, MBA) — never "Bachelor of Science" etc.
 - Put paid roles and internships in work_history (kind=work or internship).
 - Put unpaid personal/academic work in projects (no dates).
 - Preserve bullet text as written; do not invent employers, degrees, metrics, or dates.
@@ -44,4 +46,12 @@ async def process_cv(cv: UploadFile = File(...)):
     )
 
     candidate = await agent.invoke(text)
+    if candidate.education:
+        candidate = candidate.model_copy(
+            update={
+                "education": [
+                    normalize_education_entry(e) for e in candidate.education
+                ],
+            }
+        )
     return candidate

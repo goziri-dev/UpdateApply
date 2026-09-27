@@ -129,9 +129,9 @@
         <div class="edu-row">
           <span class="edu-left">
             {%- if edu.degree and edu.field and edu.institution -%}
-              {{ edu.degree }} in {{ edu.field }} from {{ edu.institution }}
+              {{ edu.degree }} in {{ edu.field }}, {{ edu.institution }}
             {%- elif edu.degree and edu.institution -%}
-              {{ edu.degree }} from {{ edu.institution }}
+              {{ edu.degree }}, {{ edu.institution }}
             {%- else -%}
               {%- set parts = [] -%}
               {%- if edu.degree %}{% set _ = parts.append(edu.degree) %}{% endif -%}
@@ -141,7 +141,7 @@
             {%- endif -%}
           </span>
           {% if edu.graduation %}
-          <span class="edu-dates">{% if edu.graduation == 'Graduated' %}Status - Graduated{% else %}{{ edu.graduation }}{% endif %}</span>
+          <span class="edu-dates">{{ edu.graduation | edu_status }}</span>
           {% endif %}
         </div>
       </li>

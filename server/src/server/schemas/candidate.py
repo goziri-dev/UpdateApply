@@ -11,14 +11,21 @@ class ExperienceKind(StrEnum):
 class EducationEntry(BaseModel):
     """A degree or formal education line from the CV."""
 
-    degree: str | None = Field(None, description="Degree type, e.g. B.A., M.S., PhD")
+    degree: str | None = Field(
+        None,
+        description=(
+            "Abbreviated degree only per resume guide: B.A., B.S., M.A., M.S., "
+            "PhD, MBA, etc. Never spell out Bachelor of Science / Master of Arts"
+        ),
+    )
     field: str | None = Field(None, description="Field of study")
     institution: str | None = Field(None, description="School or university name")
     graduation: str | None = Field(
         None,
         description=(
-            "Graduation year if within the last 3 years; otherwise 'Graduated' "
-            "when a past graduation is clear; null if unknown"
+            "Graduation year as YYYY if known (including expected future year while "
+            "still enrolled); 'Graduated' if graduation was more than 3 years ago; "
+            "null if unknown. Do not invent a year."
         ),
     )
 
