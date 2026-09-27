@@ -9,6 +9,7 @@ authors = [
 requires-python = ">=3.14"
 dependencies = [
     "fastapi[standard]>=0.141.1",
+    "jinja2>=3.1.6",
     "langchain-openrouter>=0.2.9",
     "pymupdf4llm>=1.28.2",
     "sqlmodel>=0.0.47",
@@ -24,6 +25,7 @@ build-backend = "uv_build"
 
 [tool.uv.build-backend]
 namespace = true
+source-include = ["src/server/templates/**"]
 
 [dependency-groups]
 dev = [
