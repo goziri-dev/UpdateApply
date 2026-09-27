@@ -1,0 +1,57 @@
+from fastapi import APIRouter
+
+from server.schemas.tailor_resume_request import TailorResumeRequest
+from server.schemas.tailor_resume_response import TailorResumeResponse
+from server.schemas.tailored_resume import TailoredResume
+from server.services.agent import Task, create_agent
+from server.services.resume_html import render_resume_html
+from server.services.resume_normalize import merge_profile_links, normalize_tailored_resume
+
+resume_router = APIRouter(prefix="/resume")
+
+_TAILOR_PROMPT = """\
+You rewrite a candidate's CV into a tailored resume for one job posting.
+
+Follow the Headless Headhunter resume rules:
+- Past tense everywhere, including current roles.
+- Each work/internship role: one summary bullet plus 2-7 What/How/Result bullets (3-8 total).
+- Each bullet: roughly one sentence, one period, max ~3 lines; show HOW the keyword was used and the result/reason.
+- Pack qualifications from the job into bullets; aim to surface most keywords early.
+- Order by relevance to the job, then recency; include at most ~12 years of experience.
+- Keep unpaid/volunteer organization roles in work_history (do not move them to projects).
+- Job titles: Title Case only (never ALL CAPS). Use a common market title a recruiter would recognize in 15 seconds.
+- Prefer a title close to the target job's title when the candidate's duties genuinely match; otherwise pick the nearest standard title for that work (e.g. Customer Service Assistant, Operations Assistant, Quality Assurance Associate).
+- Never invent seniority, employers, dates, degrees, or metrics. Renaming the label is allowed; inventing duties is not.
+- Do not put (Volunteer), (VOLUNTEER), or similar downgrading tags in the title — leave kind/context in bullets if needed.
+- Avoid internal mashup titles (e.g. "Customer & Operations Assistant", "Quality & Customer Experience Evaluator").
+- Projects: unpaid personal/academic projects only; no dates; summary plus up to 2 more bullets (3 max total).
+- summary (profile under contact): always write a short rewritten profile for this job — up to 2 sentences (~40–60 words), scannable in 15 seconds.
+  Sentence 1: who they are + target role (from the job) + 1–2 concrete strengths from their real experience.
+  Sentence 2 (when supported by candidate data): work authorization / visa clarity and/or shift availability (evenings, weekends, holidays, part-time). In markets like Dublin these are deal-breakers — include them when present; never invent visa status or hours.
+  Rewrite any existing candidate summary to be tighter; no buzzword stacking or long marketing paragraphs.
+- Education: keep field/institution/graduation, but degree MUST be abbreviated (B.A., B.S., M.A., M.S., PhD, MBA) — never "Bachelor of Science" / "Master of Arts".
+- Preserve certificates, contact fields, and links from the candidate (do not drop LinkedIn/GitHub/portfolio URLs).
+- List keywords_used as the job qualifications you actually wove into the resume.
+
+The user message is JSON with "candidate" and "job" objects.
+"""
+
+
+@resume_router.post("/tailor")
+async def tailor_resume(body: TailorResumeRequest) -> TailorResumeResponse:
+    agent = create_agent(
+        Task.TAILOR_RESUME,
+        system_prompt=_TAILOR_PROMPT,
+        structured_output=TailoredResume,
+    )
+    prompt = body.model_dump_json(
+        include={"candidate", "job"},
+    )
+    tailored = normalize_tailored_resume(await agent.invoke(prompt))
+    tailored = tailored.model_copy(
+        update={
+            "links": merge_profile_links(tailored.links, body.candidate.links),
+        }
+    )
+    html = render_resume_html(tailored, body.style)
+    return TailorResumeResponse(resume=tailored, html=html, style=body.style)
