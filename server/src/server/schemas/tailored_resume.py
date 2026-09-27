@@ -6,6 +6,7 @@ from server.schemas.candidate import (
     CertificateEntry,
     EducationEntry,
     ExperienceKind,
+    ProfileLink,
 )
 
 
@@ -84,14 +85,18 @@ class TailoredResume(BaseModel):
     email: EmailStr | None = Field(None, description="Email")
     phone: str | None = Field(None, description="Phone")
     location: str | None = Field(None, description="City/state; may include work auth")
-    linkedin_url: str | None = Field(None, description="LinkedIn URL")
-    website_url: str | None = Field(None, description="Portfolio/site URL")
+    links: list[ProfileLink] = Field(
+        default_factory=list,
+        description="Preserve candidate profile links (LinkedIn, GitHub, portfolio, etc.)",
+    )
     languages: list[str] = Field(default_factory=list)
     summary: str | None = Field(
         None,
         description=(
-            "Only for industry change, relocation, or visa/sponsorship; "
-            "otherwise null — do not invent"
+            "Profile under contact: up to 2 sentences (~40–60 words). "
+            "Who they are, target role, 1–2 real strengths; plus work "
+            "authorization/visa and/or availability when stated on the candidate. "
+            "Do not invent"
         ),
     )
     education: list[EducationEntry] = Field(default_factory=list)

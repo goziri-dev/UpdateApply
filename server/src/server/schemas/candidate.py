@@ -85,6 +85,16 @@ class Project(BaseModel):
     )
 
 
+class ProfileLink(BaseModel):
+    """A contact / profile hyperlink from the CV (LinkedIn, GitHub, portfolio, etc.)."""
+
+    url: str = Field(..., description="Full https URL")
+    label: str | None = Field(
+        None,
+        description="Short display label if known, e.g. LinkedIn, GitHub, Portfolio",
+    )
+
+
 class Candidate(BaseModel):
     """Full structured profile extracted from a jobseeker's CV."""
 
@@ -92,11 +102,12 @@ class Candidate(BaseModel):
     email: EmailStr | None = Field(None, description="Primary email address")
     phone: str | None = Field(None, description="Phone number as written on the CV")
     location: str | None = Field(None, description="City/region/country if present")
-    linkedin_url: str | None = Field(
-        None, description="LinkedIn profile URL if present"
-    )
-    website_url: str | None = Field(
-        None, description="Personal site or portfolio URL if present"
+    links: list[ProfileLink] = Field(
+        default_factory=list,
+        description=(
+            "Profile/contact hyperlinks from the CV (LinkedIn, GitHub, personal site, "
+            "portfolio). Include every distinct http(s) URL; do not invent links"
+        ),
     )
     work_authorization: str | None = Field(
         None,
@@ -112,8 +123,8 @@ class Candidate(BaseModel):
     summary: str | None = Field(
         None,
         description=(
-            "Only if the CV already notes industry change, relocation, or visa/"
-            "sponsorship needs; otherwise null — do not invent a summary"
+            "Profile/objective/about blurb if present on the CV, including any "
+            "visa/work-rights or availability notes; null if absent — do not invent"
         ),
     )
     education: list[EducationEntry] = Field(default_factory=list)

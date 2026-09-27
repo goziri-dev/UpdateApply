@@ -5,7 +5,7 @@ from __future__ import annotations
 import re
 from datetime import date
 
-from server.schemas.candidate import EducationEntry
+from server.schemas.candidate import EducationEntry, ProfileLink
 from server.schemas.tailored_resume import TailoredResume
 
 # Longest / most specific first so "Master of Business Administration" wins over "Master".
@@ -86,6 +86,59 @@ def normalize_education_entry(entry: EducationEntry) -> EducationEntry:
     return entry.model_copy(update={"degree": abbreviate_degree(entry.degree)})
 
 
+_LINK_PRIORITY = ("linkedin", "github", "gitlab")
+
+
+def merge_profile_links(
+    primary: list[ProfileLink],
+    secondary: list[ProfileLink],
+) -> list[ProfileLink]:
+    """Dedupe by URL (case-insensitive); prefer labeled / priority hosts."""
+    by_url: dict[str, ProfileLink] = {}
+    for link in [*primary, *secondary]:
+        url = (link.url or "").strip().rstrip("/")
+        if not url:
+            continue
+        key = url.lower()
+        existing = by_url.get(key)
+        if existing is None:
+            by_url[key] = ProfileLink(url=url, label=link.label)
+            continue
+        if not existing.label and link.label:
+            by_url[key] = ProfileLink(url=existing.url, label=link.label)
+
+    def sort_key(link: ProfileLink) -> tuple[int, str]:
+        host = link.url.lower()
+        for i, token in enumerate(_LINK_PRIORITY):
+            if token in host:
+                return (i, host)
+        return (len(_LINK_PRIORITY), host)
+
+    return sorted(by_url.values(), key=sort_key)
+
+
+def tighten_profile_summary(summary: str | None, *, max_chars: int = 420) -> str | None:
+    """Keep profile summaries to ~2 sentences with room for visa/availability."""
+    if not summary:
+        return summary
+    text = re.sub(r"\s+", " ", summary).strip()
+    if not text:
+        return None
+    parts = [p.strip() for p in re.split(r"(?<=[.!?])\s+", text) if p.strip()]
+    if len(parts) > 2:
+        text = " ".join(parts[:2]).strip()
+    if len(text) <= max_chars:
+        return text
+    kept: list[str] = []
+    for part in parts[:2]:
+        candidate = " ".join([*kept, part]).strip()
+        if kept and len(candidate) > max_chars:
+            break
+        kept.append(part)
+    out = " ".join(kept).strip() or text[:max_chars].rsplit(" ", 1)[0]
+    return out.rstrip(",;") + ("." if out and out[-1] not in ".!?" else "")
+
+
 def normalize_tailored_resume(resume: TailoredResume) -> TailoredResume:
     """Apply guide formatting fixes the LLM may miss."""
     updates: dict = {}
@@ -98,6 +151,9 @@ def normalize_tailored_resume(resume: TailoredResume) -> TailoredResume:
             role.model_copy(update={"title": normalize_job_title(role.title)})
             for role in resume.work_history
         ]
+    tightened = tighten_profile_summary(resume.summary)
+    if tightened != resume.summary:
+        updates["summary"] = tightened
     if not updates:
         return resume
     return resume.model_copy(update=updates)

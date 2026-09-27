@@ -110,8 +110,8 @@
   <header class="header">
     {% if resume.full_name %}<div class="name">{{ resume.full_name }}</div>{% endif %}
     <div class="contact">
-      {% if resume.phone or resume.email or resume.linkedin_url or resume.website_url %}
-      <p class="contact-line">{% set ns = namespace(first=true) %}{% if resume.phone %}{% set ns.first = false %}{{ resume.phone }}{% endif %}{% if resume.email %}{% if not ns.first %}<span class="sep"></span>{% endif %}{% set ns.first = false %}<a href="mailto:{{ resume.email }}">{{ resume.email }}</a>{% endif %}{% if resume.linkedin_url %}{% if not ns.first %}<span class="sep"></span>{% endif %}{% set ns.first = false %}<a href="{{ resume.linkedin_url }}">{{ resume.linkedin_url }}</a>{% endif %}{% if resume.website_url %}{% if not ns.first %}<span class="sep"></span>{% endif %}{% set ns.first = false %}<a href="{{ resume.website_url }}">{{ resume.website_url }}</a>{% endif %}</p>
+      {% if resume.phone or resume.email or resume.links %}
+      <p class="contact-line">{% set ns = namespace(first=true) %}{% if resume.phone %}{% set ns.first = false %}{{ resume.phone }}{% endif %}{% if resume.email %}{% if not ns.first %}<span class="sep"></span>{% endif %}{% set ns.first = false %}<a href="mailto:{{ resume.email }}">{{ resume.email }}</a>{% endif %}{% for link in resume.links %}{% if not ns.first %}<span class="sep"></span>{% endif %}{% set ns.first = false %}<a href="{{ link.url }}">{{ link.label or link.url }}</a>{% endfor %}</p>
       {% endif %}
       {% if resume.location %}<p class="contact-line">{{ resume.location }}</p>{% endif %}
     </div>
